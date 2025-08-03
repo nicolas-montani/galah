@@ -1,0 +1,399 @@
+{
+  "techniques": [
+    {
+      "id": "T1190",
+      "name": "Exploit Public-Facing Application", 
+      "tactic": "Initial Access",
+      "description": "Adversaries may attempt to take advantage of a weakness in an Internet-facing computer or program using software, data, or commands in order to cause unintended or unanticipated behavior.",
+      "platforms": ["Linux", "Windows", "macOS", "Network"],
+      "data_sources": ["Application Logs", "Web Logs"],
+      "keywords": ["exploit", "vulnerability", "injection", "overflow"],
+      "patterns": [
+        {
+          "type": "body",
+          "pattern": "(?i)(union|select|insert|update|delete|drop|exec|script)",
+          "is_regex": true,
+          "case_sensitive": false,
+          "weight": 0.8
+        },
+        {
+          "type": "url",
+          "pattern": "(?i)(\\.\\./|%2e%2e%2f|%252e%252e%252f)",
+          "is_regex": true,
+          "case_sensitive": false,
+          "weight": 0.9
+        }
+      ],
+      "sub_techniques": [
+        {
+          "id": "T1190.001",
+          "name": "SQL Injection",
+          "description": "Adversaries may exploit SQL injection vulnerabilities to extract or manipulate database information",
+          "keywords": ["sql", "injection", "union", "select", "sqlmap"],
+          "patterns": [
+            {
+              "type": "body",
+              "pattern": "(?i)(union.*select|or.*1.*=.*1|\\'.*or.*\\'.*=.*\\')",
+              "is_regex": true,
+              "case_sensitive": false,
+              "weight": 0.95
+            },
+            {
+              "type": "url",
+              "pattern": "(?i)(union|select|or.*1=1)",
+              "is_regex": true,
+              "case_sensitive": false,
+              "weight": 0.9
+            }
+          ]
+        },
+        {
+          "id": "T1190.002", 
+          "name": "Cross-Site Scripting",
+          "description": "Adversaries may use XSS to execute malicious scripts in victim browsers",
+          "keywords": ["xss", "script", "javascript", "alert", "onload"],
+          "patterns": [
+            {
+              "type": "body",
+              "pattern": "(?i)(<script|javascript:|onload=|onerror=|alert\\()",
+              "is_regex": true,
+              "case_sensitive": false,
+              "weight": 0.9
+            },
+            {
+              "type": "url",
+              "pattern": "(?i)(<script|alert\\(|javascript:)",
+              "is_regex": true,
+              "case_sensitive": false,
+              "weight": 0.85
+            }
+          ]
+        },
+        {
+          "id": "T1190.003",
+          "name": "Directory Traversal",
+          "description": "Adversaries may use directory traversal to access files outside the web root",
+          "keywords": ["traversal", "directory", "path", "file"],
+          "patterns": [
+            {
+              "type": "url",
+              "pattern": "(?i)(\\.\\./|\\.\\.\\\\/|%2e%2e%2f|%2e%2e%5c)",
+              "is_regex": true,
+              "case_sensitive": false,
+              "weight": 0.95
+            },
+            {
+              "type": "body",
+              "pattern": "(?i)(/etc/passwd|/etc/shadow|c:\\\\windows)",
+              "is_regex": true,
+              "case_sensitive": false,
+              "weight": 0.9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "T1505",
+      "name": "Server Software Component",
+      "tactic": "Persistence",
+      "description": "Adversaries may abuse legitimate extensible development features of servers to establish persistent access to systems.",
+      "platforms": ["Linux", "Windows", "Network"],
+      "data_sources": ["File Creation", "Process Creation", "Web Logs"],
+      "keywords": ["webshell", "backdoor", "upload", "shell"],
+      "patterns": [
+        {
+          "type": "body",
+          "pattern": "(?i)(eval|exec|system|shell_exec|passthru)",
+          "is_regex": true,
+          "case_sensitive": false,
+          "weight": 0.8
+        },
+        {
+          "type": "url",
+          "pattern": "(?i)(upload|shell|cmd|backdoor)",
+          "is_regex": true,
+          "case_sensitive": false,
+          "weight": 0.7
+        }
+      ],
+      "sub_techniques": [
+        {
+          "id": "T1505.003",
+          "name": "Web Shell",
+          "description": "Adversaries may backdoor web servers with web shells to establish persistent access",
+          "keywords": ["webshell", "c99", "r57", "shell", "backdoor"],
+          "patterns": [
+            {
+              "type": "body",
+              "pattern": "(?i)(c99|r57|wso|crystal|b374k)",
+              "is_regex": true,
+              "case_sensitive": false,
+              "weight": 0.95
+            },
+            {
+              "type": "url",
+              "pattern": "(?i)(\\.php\\?|cmd=|shell=|exec=)",
+              "is_regex": true,
+              "case_sensitive": false,
+              "weight": 0.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "T1083",
+      "name": "File and Directory Discovery",
+      "tactic": "Discovery",
+      "description": "Adversaries may enumerate files and directories or may search in specific locations of a host or network share for certain information within a file system.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "data_sources": ["File Access", "Process Command Line"],
+      "keywords": ["directory", "listing", "enumeration", "scan"],
+      "patterns": [
+        {
+          "type": "url",
+          "pattern": "(?i)(/admin|/config|/backup|\\.git|\\.env)",
+          "is_regex": true,
+          "case_sensitive": false,
+          "weight": 0.7
+        },
+        {
+          "type": "user_agent",
+          "pattern": "(?i)(dirb|gobuster|dirsearch|nikto)",
+          "is_regex": true,
+          "case_sensitive": false,
+          "weight": 0.9
+        }
+      ]
+    },
+    {
+      "id": "T1018",
+      "name": "Remote System Discovery",
+      "tactic": "Discovery", 
+      "description": "Adversaries may attempt to get a listing of other systems by IP address, hostname, or other logical identifier on a network.",
+      "platforms": ["Linux", "Windows", "macOS", "Network"],
+      "data_sources": ["Network Traffic", "Process Command Line"],
+      "keywords": ["scan", "probe", "discovery", "reconnaissance"],
+      "patterns": [
+        {
+          "type": "user_agent",
+          "pattern": "(?i)(nmap|masscan|zmap|nuclei)",
+          "is_regex": true,
+          "case_sensitive": false,
+          "weight": 0.95
+        },
+        {
+          "type": "header",
+          "pattern": "(?i)(scan|probe|test)",
+          "is_regex": true,
+          "case_sensitive": false,
+          "weight": 0.6
+        }
+      ]
+    },
+    {
+      "id": "T1595",
+      "name": "Active Scanning",
+      "tactic": "Reconnaissance",
+      "description": "Adversaries may execute active reconnaissance scans to gather information that can be used during targeting.",
+      "platforms": ["PRE"],
+      "data_sources": ["Network Traffic"],
+      "keywords": ["scanning", "probe", "reconnaissance", "enumeration"],
+      "patterns": [
+        {
+          "type": "user_agent",
+          "pattern": "(?i)(scanner|crawl|bot|spider)",
+          "is_regex": true,
+          "case_sensitive": false,
+          "weight": 0.8
+        },
+        {
+          "type": "method",
+          "pattern": "(?i)(options|trace|head)",
+          "is_regex": true,
+          "case_sensitive": false,
+          "weight": 0.6
+        }
+      ],
+      "sub_techniques": [
+        {
+          "id": "T1595.001",
+          "name": "Scanning IP Blocks",
+          "description": "Adversaries may scan victim IP blocks to gather information",
+          "keywords": ["ip", "block", "scan", "range"],
+          "patterns": [
+            {
+              "type": "header",
+              "pattern": "(?i)(x-forwarded-for|x-real-ip)",
+              "is_regex": true,
+              "case_sensitive": false,
+              "weight": 0.5
+            }
+          ]
+        },
+        {
+          "id": "T1595.002",
+          "name": "Vulnerability Scanning",
+          "description": "Adversaries may scan victims for vulnerabilities",
+          "keywords": ["vulnerability", "vuln", "exploit", "cve"],
+          "patterns": [
+            {
+              "type": "user_agent",
+              "pattern": "(?i)(nessus|openvas|qualys|rapid7)",
+              "is_regex": true,
+              "case_sensitive": false,
+              "weight": 0.9
+            },
+            {
+              "type": "url",
+              "pattern": "(?i)(/test|/probe|/check)",
+              "is_regex": true,
+              "case_sensitive": false,
+              "weight": 0.6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "T1055",
+      "name": "Process Injection",
+      "tactic": "Defense Evasion",
+      "description": "Adversaries may inject code into processes in order to evade process-based defenses as well as possibly elevate privileges.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "data_sources": ["Process Creation", "Process Memory"],
+      "keywords": ["injection", "shellcode", "payload", "bypass"],
+      "patterns": [
+        {
+          "type": "body",
+          "pattern": "(?i)(shellcode|payload|injection|bypass)",
+          "is_regex": true,
+          "case_sensitive": false,
+          "weight": 0.8
+        }
+      ]
+    },
+    {
+      "id": "T1059",
+      "name": "Command and Scripting Interpreter",
+      "tactic": "Execution",
+      "description": "Adversaries may abuse command and script interpreters to execute commands, scripts, or binaries.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "data_sources": ["Process Creation", "Command Line"],
+      "keywords": ["command", "script", "interpreter", "execution"],
+      "patterns": [
+        {
+          "type": "body", 
+          "pattern": "(?i)(cmd|bash|sh|powershell|python|perl|ruby)",
+          "is_regex": true,
+          "case_sensitive": false,
+          "weight": 0.7
+        },
+        {
+          "type": "url",
+          "pattern": "(?i)(cmd=|exec=|command=)",
+          "is_regex": true,
+          "case_sensitive": false,
+          "weight": 0.8
+        }
+      ],
+      "sub_techniques": [
+        {
+          "id": "T1059.004",
+          "name": "Unix Shell",
+          "description": "Adversaries may abuse Unix shell commands and scripts for execution",
+          "keywords": ["bash", "sh", "zsh", "unix", "linux"],
+          "patterns": [
+            {
+              "type": "body",
+              "pattern": "(?i)(/bin/bash|/bin/sh|bash -c|sh -c)",
+              "is_regex": true,
+              "case_sensitive": false,
+              "weight": 0.9
+            }
+          ]
+        },
+        {
+          "id": "T1059.001",
+          "name": "PowerShell",
+          "description": "Adversaries may abuse PowerShell commands and scripts for execution",
+          "keywords": ["powershell", "ps1", "windows"],
+          "patterns": [
+            {
+              "type": "body",
+              "pattern": "(?i)(powershell|invoke-expression|iex)",
+              "is_regex": true,
+              "case_sensitive": false,
+              "weight": 0.9
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "tactics": [
+    {
+      "tactic": "Reconnaissance", 
+      "description": "The adversary is trying to gather information they can use to plan future operations."
+    },
+    {
+      "tactic": "Initial Access",
+      "description": "The adversary is trying to get into your network."
+    },
+    {
+      "tactic": "Execution",
+      "description": "The adversary is trying to run malicious code."
+    },
+    {
+      "tactic": "Persistence", 
+      "description": "The adversary is trying to maintain their foothold."
+    },
+    {
+      "tactic": "Defense Evasion",
+      "description": "The adversary is trying to avoid being detected."
+    },
+    {
+      "tactic": "Discovery",
+      "description": "The adversary is trying to figure out your environment."
+    }
+  ],
+  "http_attack_mappings": [
+    {
+      "attack_type": "sql_injection",
+      "primary_tactic": "Initial Access",
+      "techniques": ["T1190", "T1190.001"],
+      "confidence": 0.9
+    },
+    {
+      "attack_type": "xss",
+      "primary_tactic": "Initial Access", 
+      "techniques": ["T1190", "T1190.002"],
+      "confidence": 0.85
+    },
+    {
+      "attack_type": "directory_traversal",
+      "primary_tactic": "Discovery",
+      "techniques": ["T1083", "T1190.003"],
+      "confidence": 0.9
+    },
+    {
+      "attack_type": "command_injection",
+      "primary_tactic": "Execution",
+      "techniques": ["T1059", "T1190"],
+      "confidence": 0.95
+    },
+    {
+      "attack_type": "file_inclusion",
+      "primary_tactic": "Initial Access",
+      "techniques": ["T1190"],
+      "confidence": 0.8
+    },
+    {
+      "attack_type": "reconnaissance",
+      "primary_tactic": "Reconnaissance", 
+      "techniques": ["T1595", "T1018"],
+      "confidence": 0.7
+    }
+  ]
+}
