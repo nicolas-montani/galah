@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/0x4d31/galah/pkg/mitre"
 	"github.com/0x4d31/galah/pkg/research"
 )
 
@@ -20,6 +21,7 @@ type ResearchAnalyzer struct {
 	sessions    map[string]*SessionTracker
 	sessionsMux sync.RWMutex
 	Metrics     *MetricsCalculator
+	MitreMapper *mitre.Mapper
 	dataDir     string
 }
 
@@ -49,10 +51,18 @@ func NewResearchAnalyzer(dataDir string) *ResearchAnalyzer {
 		log.Printf("Failed to create research data directory: %v", err)
 	}
 	
+	// Initialize MITRE mapper
+	mitreMapper, err := mitre.NewMapper("data/mitre/techniques.json")
+	if err != nil {
+		log.Printf("Failed to initialize MITRE mapper: %v", err)
+		mitreMapper = nil
+	}
+	
 	return &ResearchAnalyzer{
-		sessions: make(map[string]*SessionTracker),
-		Metrics:  NewMetricsCalculator(),
-		dataDir:  dataDir,
+		sessions:    make(map[string]*SessionTracker),
+		Metrics:     NewMetricsCalculator(),
+		MitreMapper: mitreMapper,
+		dataDir:     dataDir,
 	}
 }
 
@@ -79,10 +89,32 @@ func (ra *ResearchAnalyzer) AnalyzeRequest(r *http.Request, body string, session
 	// Analyze payload
 	payloadInfo := ra.analyzePayload(body, attackVectors)
 	
+	// MITRE ATT&CK classification
+	var mitreTechniques []string
+	if ra.MitreMapper != nil {
+		mitreResult := ra.MitreMapper.MapRequest(r, body, sessionID, attackVectors)
+		for _, match := range mitreResult.Matches {
+			mitreTechniques = append(mitreTechniques, match.Technique.ID)
+			if match.SubTechnique != nil {
+				mitreTechniques = append(mitreTechniques, match.SubTechnique.ID)
+			}
+		}
+		
+		// Update risk score with MITRE assessment
+		if mitreResult.OverallRisk > riskScore {
+			riskScore = mitreResult.OverallRisk
+		}
+		
+		// Update attack type with MITRE primary tactic if more specific
+		if mitreResult.PrimaryTactic != "" && attackType == "unknown" {
+			attackType = strings.ToLower(strings.ReplaceAll(mitreResult.PrimaryTactic, " ", "_"))
+		}
+	}
+	
 	return &research.EventAnalysis{
 		AttackType:      attackType,
 		Confidence:      confidence,
-		MITRETechniques: []string{}, // Will be populated by MITRE integration
+		MITRETechniques: mitreTechniques,
 		PayloadAnalysis: payloadInfo,
 		Anomalies:       anomalies,
 		RiskScore:       riskScore,
@@ -655,4 +687,25 @@ func (ra *ResearchAnalyzer) CleanupSessions(maxAge time.Duration) {
 			delete(ra.sessions, sessionID)
 		}
 	}
+	
+	// Also cleanup MITRE campaigns
+	if ra.MitreMapper != nil {
+		ra.MitreMapper.CleanupOldCampaigns(maxAge)
+	}
+}
+
+// GetMITREReport generates a MITRE ATT&CK report for a session
+func (ra *ResearchAnalyzer) GetMITREReport(sessionID string) *mitre.MITREReport {
+	if ra.MitreMapper == nil {
+		return nil
+	}
+	return ra.MitreMapper.GenerateReport(sessionID)
+}
+
+// GetAttackCampaign returns MITRE attack campaign information for a session
+func (ra *ResearchAnalyzer) GetAttackCampaign(sessionID string) (*mitre.AttackCampaign, bool) {
+	if ra.MitreMapper == nil {
+		return nil, false
+	}
+	return ra.MitreMapper.GetCampaign(sessionID)
 }
