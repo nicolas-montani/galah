@@ -1,0 +1,34 @@
+\chapter{Implementation}
+% Implementation content goes here.
+Details about the implementation, methods used, and technical aspects of the research.
+
+% Example code listing
+\lstinputlisting[caption={Sample Python Code from File}, label={code:sample_python}, language=Python]{code/sample.py}
+
+
+\begin{lstlisting}[caption={Sample Inline Python Code}, label={code:sample_python_inline}, language=Python]
+def my_function(x):
+    return x * 2
+\end{lstlisting}
+
+Display class and method names:\\
+Here is a class name: \mintinline{java}{MyClass}\\
+Here is a method name: \mintinline{java}{myMethod()}
+
+
+% Example algorithm
+\begin{algorithm}[H]
+    \KwInput{Set of data $D$}
+    \KwOutput{Processed result $R$}
+    \While{condition}{
+        perform some action\;
+        \If{some condition}{
+            take some step\;
+        }
+    }
+    \caption{Sample Algorithm}
+    \label{alg:sample_algorithm}
+\end{algorithm}
+
+% insert algorithm from file
+\input{algorithms/sample_algorithm}

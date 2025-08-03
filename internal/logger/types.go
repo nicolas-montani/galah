@@ -2,6 +2,7 @@ package logger
 
 import (
 	"os"
+	"time"
 
 	"github.com/0x4d31/galah/pkg/enrich"
 	"github.com/0x4d31/galah/pkg/llm"
@@ -30,12 +31,24 @@ type HTTPRequest struct {
 	Request             string            `json:"request"`
 	SessionID           string            `json:"sessionID"`
 	UserAgent           string            `json:"userAgent"`
+	// Research-focused fields
+	RequestSize         int64             `json:"requestSize"`
+	ContentType         string            `json:"contentType"`
+	RequestFingerprint  string            `json:"requestFingerprint"`
+	AttackVectors       []string          `json:"attackVectors,omitempty"`
+	SuspiciousPatterns  []string          `json:"suspiciousPatterns,omitempty"`
 }
 
 // ResponseMetadata holds metadata about the generated response
 type ResponseMetadata struct {
-	GenerationSource string  `json:"generationSource"`
-	Info             LLMInfo `json:"info,omitempty"`
+	GenerationSource    string        `json:"generationSource"`
+	Info                LLMInfo       `json:"info,omitempty"`
+	ProcessingTime      time.Duration `json:"processingTimeMs"`
+	PromptTokens        int           `json:"promptTokens,omitempty"`
+	CompletionTokens    int           `json:"completionTokens,omitempty"`
+	CacheHit           bool          `json:"cacheHit"`
+	ResponseQuality    float64       `json:"responseQuality,omitempty"`
+	ContextAdaptation  string        `json:"contextAdaptation,omitempty"`
 }
 
 // LLMInfo holds information about the large language model
@@ -44,3 +57,4 @@ type LLMInfo struct {
 	Provider    string  `json:"provider,omitempty"`
 	Temperature float64 `json:"temperature,omitempty"`
 }
+

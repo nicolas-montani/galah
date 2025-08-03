@@ -1,0 +1,168 @@
+\documentclass[11pt,a4paper]{report}
+
+% Language UK English
+\usepackage[UKenglish]{babel}
+
+% Import all necessary packages
+\usepackage{geometry,graphicx,parskip,appendix,float,hyperref,setspace,titlesec,fontspec}
+\usepackage[ruled]{algorithm2e}
+\usepackage{url,amsmath,amssymb,fancybox,listings,pdfpages,caption,multicol,datetime,rotating,booktabs,todonotes}
+\usepackage{csquotes,minted}
+
+\usepackage{pdfpages}  % For including PDFs
+
+\usepackage[backend=biber,style=apa]{biblatex} % ApA-style bibliography
+%\usepackage[backend=biber,style=authoryear]{biblatex} % Harvard-style bibliography
+
+\addbibresource{bibliography.bib}
+
+% Set Times New Roman as the default font
+\setmainfont{Times New Roman}
+
+% Set page margins
+\geometry{left=3cm, right=2cm, top=3cm, bottom=3cm}
+
+% Custom section formatting
+\titleformat{\chapter}[block]{\normalfont\fontsize{16}{20}\bfseries}{\thechapter}{20pt}{}
+\titleformat{\section}[block]{\normalfont\fontsize{15}{18}\bfseries}{\thesection}{12pt}{}
+\titleformat{\subsection}[block]{\normalfont\fontsize{14}{16}\bfseries}{\thesubsection}{12pt}{}
+\titleformat{\subsubsection}[block]{\normalfont\fontsize{12}{14}\bfseries}{\thesubsubsection}{12pt}{}
+
+% Line spacing
+\onehalfspacing
+
+% Set tocdepth to 3 to include subsubsections in the table of contents
+\setcounter{tocdepth}{3}
+
+% Set secnumdepth to 3 to enable numbering for subsubsections
+\setcounter{secnumdepth}{3}
+
+% Hyperref settings
+\hypersetup{
+    pdftitle    = {Thesis Title},
+    pdfauthor   = {Author Name},
+    pdfsubject  = {Subject Area},
+    pdfkeywords = {Keyword1, Keyword2, Keyword3},
+    colorlinks  = true, anchorcolor = blue, filecolor = blue, urlcolor = blue,
+    linkcolor   = black, citecolor   = blue,
+}
+
+\definecolor{colBackGrnd}{rgb}{1,1,0.8}
+\definecolor{colKeys}{rgb}{0,0,1}
+\definecolor{colIdentifier}{rgb}{0,0,0}
+\definecolor{colComments}{rgb}{0,.5,0}
+\definecolor{colString}{rgb}{0,0,1}
+\definecolor{colWhite}{rgb}{1,1,1}
+
+% code reference setup
+\definecolor{mintbgcolor}{rgb}{0.9,0.9,0.9} % gray background
+
+\setminted{
+    bgcolor=mintbgcolor,
+}
+
+\newcommand{\MyHookSign}{\hbox{\ensuremath\hookleftarrow}}
+
+% Algorithm settings
+\SetKwInput{KwInput}{Input} % Customize input keyword
+\SetKwInput{KwOutput}{Output} % Customize output keyword
+
+% Code listing settings
+%NOTE: Setup for including program listings
+\lstset{%
+    float=H,
+    basicstyle=\ttfamily\footnotesize,
+    identifierstyle=\color{colIdentifier},
+    keywordstyle=\color{colIdentifier}, %
+    stringstyle=\color{colIdentifier},
+    commentstyle=\color{colIdentifier}, %
+    columns=flexible,
+    tabsize=2,
+    frame=single,
+    extendedchars=true, %
+    showspaces=false,
+    showstringspaces=false,
+    numbers=left, %
+    numberstyle=\footnotesize,
+    breaklines=true,
+    prebreak={\space\MyHookSign},
+    language=Java,
+    backgroundcolor=\color{colBackGrnd},
+    breakautoindent=true, %
+    captionpos=b%
+}
+
+% Start of the document
+\begin{document}
+
+% Title page
+\begin{titlepage}
+    \centering
+    \includegraphics[width=2cm,height=2.1cm]{images/university_logo.png}\\[0.7cm]
+    
+    {\fontsize{18}{22}\selectfont UNIVERSITY OF ST.GALLEN}\\[0.5cm]
+    {\fontsize{11}{13}\selectfont School of Management, Economics,\\
+    Law, Social Sciences, International Affairs and Computer Science}\\[4cm]
+    
+    \rule{\linewidth}{0.3mm} \\[0.4cm]
+    {\fontsize{16}{18}\selectfont Type of Paper}\\[0.4cm]
+    {\fontsize{20}{24}\bfseries Title of Paper}\\[0.4cm]
+    {\fontsize{16}{18}\selectfont Subtitle of Paper}\\[0.3cm]
+    \rule{\linewidth}{0.3mm} \\[2.5cm]
+    
+    \begin{center}
+        {\fontsize{12}{14}\selectfont Submitted by:} \\
+        {\fontsize{12}{14}\selectfont First name Last name} \\
+        {\fontsize{12}{14}\selectfont Matriculation number} \\[1cm]
+
+        %Name and Matriculation Nr as Table
+        %\begin{tabular}{lll}
+        %   {\fontsize{12}{14}\selectfont First name Last name} & {\fontsize{12}{14}\selectfont Matriculation number}
+        %\end{tabular} \\[3cm]
+    
+        {\fontsize{12}{14}\selectfont Approved on Application by:} \\[0.2cm]
+        {\fontsize{12}{14}\selectfont Professor: \\Name and full title of professor} \\[1.5cm]
+    
+        {\fontsize{12}{14}\selectfont Date of Submission:} \\[0.2cm]
+        {\fontsize{12}{14}\selectfont Day/Month/Year}
+    \end{center}
+    
+\end{titlepage}
+
+% Include abstract
+\include{sections/abstract}
+
+% Table of contents
+\tableofcontents
+\newpage
+
+% List of figures and tables
+\listoffigures
+\listoftables  
+\listofalgorithms % List of algorithms
+\lstlistoflistings % List of code listings
+\newpage
+
+% Chapters
+\include{chapters/01_introduction}
+\include{chapters/02_literature_review}
+
+
+% Bibliography
+\printbibliography
+
+% Appendices
+\appendix
+\include{appendices/appendix}
+
+% Declaration of Authorship
+\includepdf[pages=-, pagecommand={\section{Declaration of Authorship} \thispagestyle{plain}}]{pdfs/hsg_declaration_of_authorship_en.pdf}
+
+
+% Declaration of Confidentiality
+\includepdf[pages=-, pagecommand={\section{Declaration of Confidentiality} \thispagestyle{plain}}]{pdfs/hsg_declaration_of_confidentiality.pdf}
+
+
+
+
+\end{document}
