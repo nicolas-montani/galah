@@ -1,0 +1,53 @@
+\babel@toc {UKenglish}{}\relax 
+\contentsline {chapter}{\numberline {1}Introduction}{8}{chapter.1}%
+\contentsline {chapter}{\numberline {2}Literature Review}{10}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Traditional Honeypot Technologies and Limitations}{10}{section.2.1}%
+\contentsline {section}{\numberline {2.2}AI and Machine Learning in Cybersecurity}{11}{section.2.2}%
+\contentsline {section}{\numberline {2.3}AI-Enhanced Honeypot Systems}{12}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Model Training for Cybersecurity Applications}{13}{section.2.4}%
+\contentsline {section}{\numberline {2.5}HTTP Protocol Security and Web-Based Attacks}{14}{section.2.5}%
+\contentsline {section}{\numberline {2.6}Containerization and Deployment Frameworks}{15}{section.2.6}%
+\contentsline {section}{\numberline {2.7}Threat Intelligence and Analysis}{15}{section.2.7}%
+\contentsline {section}{\numberline {2.8}MITRE ATT\&CK Framework}{16}{section.2.8}%
+\contentsline {section}{\numberline {2.9}Ethical and Legal Considerations}{17}{section.2.9}%
+\contentsline {chapter}{\numberline {3}Galah: The Foundation LLM-Enhanced Honeypot System}{19}{chapter.3}%
+\contentsline {section}{\numberline {3.1}System Architecture and Design Principles}{19}{section.3.1}%
+\contentsline {section}{\numberline {3.2}LLM Integration and Provider Abstraction}{20}{section.3.2}%
+\contentsline {section}{\numberline {3.3}HTTP Request Processing and Analysis}{20}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Response Generation and Consistency Management}{21}{section.3.4}%
+\contentsline {section}{\numberline {3.5}Caching Architecture and Optimization}{22}{section.3.5}%
+\contentsline {section}{\numberline {3.6}Event Logging and Audit Capabilities}{22}{section.3.6}%
+\contentsline {section}{\numberline {3.7}Integration with Security Infrastructure}{23}{section.3.7}%
+\contentsline {section}{\numberline {3.8}Performance Characteristics and Scalability}{24}{section.3.8}%
+\contentsline {section}{\numberline {3.9}Security Considerations and Hardening}{24}{section.3.9}%
+\contentsline {chapter}{\numberline {4}AI/LLM Extensions to Galah: Advanced Intelligence and Adaptive Response Systems}{26}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Enhanced Research Data Collection Framework}{26}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Advanced Attack Vector Detection}{26}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Sophisticated Payload Analysis}{27}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}Comprehensive Session Tracking and Timeline Analysis}{27}{subsection.4.1.3}%
+\contentsline {section}{\numberline {4.2}MITRE ATT\&CK Framework Integration}{28}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Automated Technique Classification}{28}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Confidence Scoring and Evidence Collection}{28}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Attack Campaign Tracking and Threat Actor Identification}{29}{subsection.4.2.3}%
+\contentsline {section}{\numberline {4.3}Behavioral Analysis and Attacker Profiling System}{29}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Sophisticated Attacker Classification}{29}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Advanced Behavioral Metrics and Analysis}{30}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Tool Detection and Signature Analysis}{30}{subsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.3.4}Attack Pattern Recognition and Classification}{31}{subsection.4.3.4}%
+\contentsline {section}{\numberline {4.4}Context-Aware Response Generation Framework}{31}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Intelligent Context Analysis Engine}{31}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Adaptive Response Strategy Selection}{32}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}Dynamic Content Generation and Complexity Scaling}{32}{subsection.4.4.3}%
+\contentsline {subsection}{\numberline {4.4.4}Machine Learning Integration and Adaptive Optimization}{33}{subsection.4.4.4}%
+\contentsline {subsection}{\numberline {4.4.5}Integration with Behavioral Analysis and MITRE Classification}{33}{subsection.4.4.5}%
+\contentsline {section}{\numberline {4.5}Research Data Export and Analysis Capabilities}{34}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}Structured Dataset Generation}{34}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Privacy-Preserving Data Processing}{34}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}Academic Research Integration}{35}{subsection.4.5.3}%
+\contentsline {section}{\numberline {4.6}Performance Analysis and Scalability Considerations}{35}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}Computational Resource Requirements}{35}{subsection.4.6.1}%
+\contentsline {subsection}{\numberline {4.6.2}Scalability Architecture and Load Distribution}{36}{subsection.4.6.2}%
+\contentsline {subsection}{\numberline {4.6.3}Performance Optimization Strategies}{36}{subsection.4.6.3}%
+\contentsline {chapter}{\numberline {A}Appendix}{38}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Declaration of Authorship}{39}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Declaration of Confidentiality}{40}{section.A.2}%

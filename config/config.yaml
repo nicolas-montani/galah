@@ -30,12 +30,12 @@ ports:
     protocol: HTTP
   - port: 8888
     protocol: HTTP
-  - port: 443
-    protocol: TLS
-    tls_profile: tls_profile1
-  - port: 8443
-    protocol: TLS
-    tls_profile: tls_profile1
+  #- port: 443
+  #  protocol: TLS
+  #  tls_profile: tls_profile1
+  #- port: 8443
+  #  protocol: TLS
+  #  tls_profile: tls_profile1
 
 # TLS Profiles
 profiles:
