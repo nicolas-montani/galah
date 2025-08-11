@@ -1,0 +1,220 @@
+
+services:
+  # Ollama Service for Local LLM
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - elk-network
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    healthcheck:
+      test: ["CMD", "pgrep", "ollama"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Galah Honeypot Service
+  galah:
+    build: ./galah-core
+    container_name: galah-honeypot
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      logstash:
+        condition: service_healthy
+    environment:
+      - LLM_PROVIDER=${LLM_PROVIDER:-ollama}
+      - LLM_MODEL=${LLM_MODEL:-deepseek-coder:1.3b}
+      - LLM_SERVER_URL=${LLM_SERVER_URL:-http://ollama:11434}
+      - LLM_TEMPERATURE=${LLM_TEMPERATURE:-0.7}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+      - LLM_CLOUD_PROJECT=${LLM_CLOUD_PROJECT:-}
+      - LLM_CLOUD_LOCATION=${LLM_CLOUD_LOCATION:-}
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+      - "9090:9090"
+    volumes:
+      - ./logs:/galah/logs
+      - ./galah-core/config:/galah/config:ro
+      - galah_cache:/galah/cache
+    networks:
+      - elk-network
+    restart: unless-stopped
+    command: [
+      "-p", "${LLM_PROVIDER:-ollama}",
+      "-m", "${LLM_MODEL:-deepseek-coder:1.3b}",
+      "-u", "${LLM_SERVER_URL:-http://ollama:11434}",
+      "-o", "/galah/logs/galah.json",
+      "--suricata-enabled",
+      "--suricata-rules-dir", "/galah/config"
+    ]
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Elasticsearch Service
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: elasticsearch
+    environment:
+      - node.name=es01
+      - cluster.name=galah-elk
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - xpack.security.enabled=true
+      - xpack.security.authc.api_key.enabled=true
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-galah123}
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+      - ./elk/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./elk/elasticsearch/index-templates:/usr/share/elasticsearch/config/index-templates:ro
+    ports:
+      - "9200:9200"
+    networks:
+      - elk-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u elastic:${ELASTIC_PASSWORD:-galah123} -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"\\(green\\|yellow\\)'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Logstash Service
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    container_name: logstash
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      - "LS_JAVA_OPTS=-Xmx1g -Xms1g"
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-galah123}
+    volumes:
+      - ./elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./elk/logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./logs:/logs:ro
+      - ./elk/logstash/templates:/usr/share/logstash/templates:ro
+    ports:
+      - "5044:5044/tcp"
+      - "5044:5044/udp"
+      - "9600:9600"
+    networks:
+      - elk-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-s", "http://localhost:9600"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+
+  # Elasticsearch Setup - Initialize users and passwords
+  es-setup:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: es-setup
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-galah123}
+    networks:
+      - elk-network
+    command: >
+      bash -c '
+        echo "Setting up Elasticsearch users..."
+        # Set password for kibana_system user
+        curl -X POST -u elastic:${ELASTIC_PASSWORD} "http://elasticsearch:9200/_security/user/kibana_system/_password" \
+          -H "Content-Type: application/json" \
+          -d "{\"password\": \"${ELASTIC_PASSWORD}\"}" \
+          || echo "User setup completed or already exists"
+        echo "Elasticsearch setup completed"
+      '
+    restart: "no"
+
+  # Dashboard Setup Service - Imports pre-configured Galah dashboard
+  dashboard-setup:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: dashboard-setup
+    depends_on:
+      kibana:
+        condition: service_healthy
+    environment:
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-galah123}
+    networks:
+      - elk-network
+    volumes:
+      - ./elk/kibana/dashboards:/usr/share/kibana/dashboards:ro
+      - ./elk/kibana/import-dashboard.sh:/usr/share/kibana/import-dashboard.sh:ro
+    command: >
+      bash -c "
+        echo '🍯 Starting Dashboard Import...' &&
+        sleep 10 &&
+        /usr/share/kibana/import-dashboard.sh
+      "
+    restart: "no"
+
+  # Kibana Service
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: kibana
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      es-setup:
+        condition: service_completed_successfully
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD:-galah123}
+      - SERVER_NAME=kibana
+      - SERVER_HOST=0.0.0.0
+      - XPACK_SECURITY_ENABLED=true
+      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${KIBANA_ENCRYPTION_KEY:-galahsecretencryptionkey32charxx}
+      - NODE_OPTIONS=--no-openssl-legacy-provider
+    volumes:
+      - ./elk/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+      - ./elk/kibana/dashboards:/usr/share/kibana/dashboards:ro
+      - kibana_data:/usr/share/kibana/data
+    ports:
+      - "5601:5601"
+    networks:
+      - elk-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-s", "http://localhost:5601/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  elasticsearch_data:
+    driver: local
+  kibana_data:
+    driver: local
+  galah_cache:
+    driver: local
+  ollama_data:
+    driver: local
+
+networks:
+  elk-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

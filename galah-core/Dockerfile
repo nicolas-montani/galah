@@ -3,6 +3,6 @@ WORKDIR /galah
 COPY . .
 RUN <<EOF
 go mod download
-go build -o galah ./cmd/galah
+go build -o galah-app ./cmd/galah
 EOF
-ENTRYPOINT ["./galah"]
+ENTRYPOINT ["./galah-app"]

@@ -1,0 +1,41 @@
+# Kibana Configuration for Galah Honeypot
+server.host: "0.0.0.0"
+server.port: 5601
+server.name: "galah-kibana"
+
+# Elasticsearch connection
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+elasticsearch.username: "kibana_system"
+elasticsearch.password: "${ELASTICSEARCH_PASSWORD}"
+
+# Security settings
+xpack.security.enabled: true
+xpack.encryptedSavedObjects.encryptionKey: "${XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY}"
+
+# Kibana index configuration removed - handled automatically in 8.x
+
+# Logging
+logging.appenders.default:
+  type: console
+  layout:
+    type: json
+logging.root:
+  appenders: [default]
+  level: info
+
+# UI Settings
+map.includeElasticMapsService: false
+telemetry.enabled: false
+newsfeed.enabled: false
+
+# Advanced settings
+server.maxPayload: 1048576
+
+# Dashboard and visualization settings
+xpack.canvas.enabled: true
+xpack.infra.enabled: true
+xpack.apm.enabled: false
+xpack.uptime.enabled: false
+
+# Monitoring
+monitoring.ui.container.elasticsearch.enabled: true

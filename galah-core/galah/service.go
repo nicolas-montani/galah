@@ -164,7 +164,12 @@ func createService(ctx context.Context, cfg *config.Config, rules []config.Rule,
 	enrichCache := enrich.New(enrich.Config{CacheSize: cacheSize, CacheTTL: lookupTTL})
 	sessionizer := el.NewSessionizer(el.Config{CacheSize: cacheSize, CacheTTL: sessionTTL})
 
-	eventLogger, err := el.New(opts.EventLogFile, modelCfg, enrichCache, sessionizer, logger)
+	// Create ELK configuration (can be enhanced with command line flags)
+	elkConfig := &el.ELKConfig{
+		Enabled: false, // Default to disabled
+	}
+
+	eventLogger, err := el.New(opts.EventLogFile, modelCfg, enrichCache, sessionizer, logger, elkConfig)
 	if err != nil {
 		return nil, err
 	}

@@ -159,7 +159,12 @@ func (a *App) init() error {
 		CacheTTL:  sessionTTL,
 	})
 
-	eventLogger, err := el.New(args.EventLogFile, modelConfig, enrichCache, sessionizer, cblog.Default())
+	// Create ELK configuration (can be enhanced with command line flags)
+	elkConfig := &el.ELKConfig{
+		Enabled: false, // Default to disabled
+	}
+
+	eventLogger, err := el.New(args.EventLogFile, modelConfig, enrichCache, sessionizer, cblog.Default(), elkConfig)
 	if err != nil {
 		return err
 	}
