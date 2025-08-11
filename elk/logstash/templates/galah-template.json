@@ -1,0 +1,273 @@
+{
+  "index_patterns": ["galah-events-*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "index": {
+        "codec": "best_compression",
+        "refresh_interval": "30s",
+        "max_result_window": 50000
+      }
+    },
+    "mappings": {
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        },
+        "eventTime": {
+          "type": "date"
+        },
+        "srcIP": {
+          "type": "ip"
+        },
+        "srcHost": {
+          "type": "keyword"
+        },
+        "srcPort": {
+          "type": "integer"
+        },
+        "port": {
+          "type": "keyword"
+        },
+        "sensorName": {
+          "type": "keyword"
+        },
+        "tags": {
+          "type": "keyword"
+        },
+        "httpRequest": {
+          "properties": {
+            "sessionID": {
+              "type": "keyword"
+            },
+            "method": {
+              "type": "keyword"
+            },
+            "protocolVersion": {
+              "type": "keyword"
+            },
+            "request": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 1024
+                }
+              }
+            },
+            "userAgent": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 1024
+                }
+              }
+            },
+            "headers": {
+              "type": "object",
+              "enabled": false
+            },
+            "headersSorted": {
+              "type": "keyword"
+            },
+            "headersSortedSha256": {
+              "type": "keyword"
+            },
+            "body": {
+              "type": "text"
+            },
+            "bodySha256": {
+              "type": "keyword"
+            },
+            "requestSize": {
+              "type": "long"
+            },
+            "contentType": {
+              "type": "keyword"
+            },
+            "requestFingerprint": {
+              "type": "keyword"
+            },
+            "attackVectors": {
+              "type": "keyword"
+            },
+            "suspiciousPatterns": {
+              "type": "keyword"
+            }
+          }
+        },
+        "httpResponse": {
+          "properties": {
+            "status": {
+              "type": "integer"
+            },
+            "headers": {
+              "type": "object",
+              "enabled": false
+            },
+            "body": {
+              "type": "text"
+            }
+          }
+        },
+        "responseMetadata": {
+          "properties": {
+            "generationSource": {
+              "type": "keyword"
+            },
+            "info": {
+              "properties": {
+                "provider": {
+                  "type": "keyword"
+                },
+                "model": {
+                  "type": "keyword"
+                },
+                "temperature": {
+                  "type": "float"
+                }
+              }
+            },
+            "processingTime": {
+              "type": "long"
+            },
+            "promptTokens": {
+              "type": "integer"
+            },
+            "completionTokens": {
+              "type": "integer"
+            },
+            "cacheHit": {
+              "type": "boolean"
+            },
+            "responseQuality": {
+              "type": "float"
+            },
+            "contextAdaptation": {
+              "type": "keyword"
+            }
+          }
+        },
+        "suricataMatches": {
+          "properties": {
+            "sid": {
+              "type": "keyword"
+            },
+            "msg": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 512
+                }
+              }
+            }
+          }
+        },
+        "error": {
+          "properties": {
+            "type": {
+              "type": "keyword"
+            },
+            "msg": {
+              "type": "text"
+            },
+            "invalidResponse": {
+              "type": "text"
+            }
+          }
+        },
+        "geoip": {
+          "properties": {
+            "city_name": {
+              "type": "keyword"
+            },
+            "country_code2": {
+              "type": "keyword"
+            },
+            "country_code3": {
+              "type": "keyword"
+            },
+            "country_name": {
+              "type": "keyword"
+            },
+            "continent_code": {
+              "type": "keyword"
+            },
+            "region_name": {
+              "type": "keyword"
+            },
+            "region_code": {
+              "type": "keyword"
+            },
+            "timezone": {
+              "type": "keyword"
+            },
+            "location": {
+              "type": "geo_point"
+            },
+            "latitude": {
+              "type": "float"
+            },
+            "longitude": {
+              "type": "float"
+            }
+          }
+        },
+        "http_method": {
+          "type": "keyword"
+        },
+        "http_path": {
+          "type": "keyword"
+        },
+        "file_extension": {
+          "type": "keyword"
+        },
+        "has_attack_vectors": {
+          "type": "boolean"
+        },
+        "attack_count": {
+          "type": "integer"
+        },
+        "response_category": {
+          "type": "keyword"
+        },
+        "user_agent_category": {
+          "type": "keyword"
+        },
+        "has_suricata_matches": {
+          "type": "boolean"
+        },
+        "suricata_rule_count": {
+          "type": "integer"
+        },
+        "suricata_sids": {
+          "type": "keyword"
+        },
+        "honeypot_type": {
+          "type": "keyword"
+        },
+        "event_classification": {
+          "type": "keyword"
+        },
+        "request_body_size": {
+          "type": "long"
+        },
+        "llm_provider": {
+          "type": "keyword"
+        },
+        "llm_model": {
+          "type": "keyword"
+        },
+        "session_id": {
+          "type": "keyword"
+        },
+        "service_type": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}

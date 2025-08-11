@@ -1,7 +1,57 @@
-.DS_Store
-.vscode
+# Go build artifacts
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+
+# LaTeX artifacts  
+*.aux
+*.log
+*.toc
+*.out
+*.synctex.gz
+*.bcf
+*.run.xml
+*.loa
+*.lof
+*.lol
+*.lot
+
+# Runtime files
+cache.db
+*.sqlite
+*.db
+
+# Docker volumes
+elasticsearch_data/
+kibana_data/
+galah_cache/
+ollama_data/
+
+# Security files
 *.crt
 *.key
 *.pem
-*.db
-/bin
+
+# IDE
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test coverage
+coverage.out
+coverage.html
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

@@ -10,6 +10,30 @@ The prompt configuration is key in this honeypot. While you can update the promp
 
 > **Note:** Galah was developed as a fun weekend project to explore the capabilities of LLMs in crafting HTTP messages. The honeypot may be identifiable through various methods such as network fingerprinting techniques, prolonged response times depending on the LLM provider and model, and non-standard responses. To protect against Denial of Wallet attacks, be sure to **set usage limits on your LLM API**.
 
+## Project Structure
+
+```
+galah/
+├── galah-core/          # Main Go application
+│   ├── cmd/             # Application entry points
+│   ├── internal/        # Private application packages
+│   ├── pkg/             # Public library packages
+│   ├── galah/           # Core service package
+│   └── config/          # Configuration files
+├── elk/                 # ELK Stack integration
+│   ├── elasticsearch/   # Elasticsearch configuration
+│   ├── logstash/        # Logstash pipelines
+│   └── kibana/          # Kibana dashboards
+├── docs/                # Documentation
+├── tests/               # Integration tests
+│   └── integration/     # End-to-end tests
+├── research/            # Research data and papers
+│   ├── Paper/           # Academic paper
+│   └── data/            # Research datasets
+├── logs/                # Runtime logs
+└── bin/                 # Built binaries
+```
+
 ## Getting Started
 
 ### Local Deployment
@@ -89,6 +113,51 @@ Options:
 % docker build -t galah-image .
 % docker run -d --name galah-container -p 8080:8080 -v $(pwd)/logs:/galah/logs -e LLM_API_KEY galah-image -o logs/galah.json -p openai -m gpt-3.5-turbo-1106
 ```
+
+### ELK Stack Integration
+
+For advanced logging, analysis, and visualization, Galah includes full ELK Stack (Elasticsearch, Logstash, Kibana) integration:
+
+```bash
+# Quick setup with ELK Stack
+git clone git@github.com:0x4D31/galah.git
+cd galah
+
+# Initial setup
+./scripts/setup-elk.sh setup
+
+# Configure your environment  
+cp .env.example .env
+# Default uses Ollama with Deepseek-Coder (no API key required)
+# Or edit .env with your preferred LLM provider
+
+# Start ELK Stack services
+./scripts/setup-elk.sh start
+
+# Import pre-configured dashboards
+./scripts/import-dashboards.sh
+
+# Start Galah honeypot
+docker-compose up galah
+
+# Or start everything with a single command:
+docker compose up -d
+```
+
+**Access Points:**
+- **Kibana Dashboard**: http://localhost:5601 (elastic/password from .env)
+- **Elasticsearch**: http://localhost:9200
+- **Galah Honeypot**: http://localhost:8080
+- **Ollama API**: http://localhost:11434
+
+**Features:**
+- Real-time honeypot event monitoring
+- Geographic attack visualization
+- Advanced filtering and search capabilities
+- Pre-built security dashboards
+- Automated log parsing and enrichment
+
+For detailed ELK integration instructions, see [ELK Integration Guide](docs/ELK-INTEGRATION.md).
 
 ## Example Usage
 

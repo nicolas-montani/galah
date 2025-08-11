@@ -26,13 +26,18 @@ const (
 )
 
 // New creates a new Logger instance with the specified configuration.
-func New(eventLogFile string, modelConfig llm.Config, eCache *enrich.Enricher, sessionizer *Sessionizer, l *cblog.Logger) (*Logger, error) {
+func New(eventLogFile string, modelConfig llm.Config, eCache *enrich.Enricher, sessionizer *Sessionizer, l *cblog.Logger, elkConfig *ELKConfig) (*Logger, error) {
+	// Use ISO 8601 timestamp format for ELK compatibility
 	eventLogger := cblog.NewWithOptions(nil, cblog.Options{Formatter: cblog.JSONFormatter, TimeFormat: time.RFC3339Nano})
 	evFile, err := os.OpenFile(eventLogFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return nil, err
 	}
 	eventLogger.SetOutput(evFile)
+
+	if elkConfig == nil {
+		elkConfig = &ELKConfig{Enabled: false}
+	}
 
 	return &Logger{
 		EnrichCache: eCache,
@@ -41,6 +46,7 @@ func New(eventLogFile string, modelConfig llm.Config, eCache *enrich.Enricher, s
 		EventFile:   evFile,
 		LLMConfig:   modelConfig,
 		Logger:      l,
+		ELKConfig:   elkConfig,
 	}, nil
 }
 
@@ -126,7 +132,15 @@ func (l *Logger) commonFields(r *http.Request, port string) map[string]any {
 		l.Logger.Errorf("error generating session ID for %q: %s", srcIP, err)
 	}
 
+	// Enhanced request analysis for ELK
+	contentType := r.Header.Get("Content-Type")
+	requestSize := r.ContentLength
+	if requestSize == -1 && bodyBytes != nil {
+		requestSize = int64(len(bodyBytes))
+	}
+
 	return map[string]any{
+		"@timestamp": now.Format(time.RFC3339Nano), // ELK-compatible timestamp
 		"eventTime":  now,
 		"srcIP":      srcIP,
 		"srcHost":    host,
@@ -134,6 +148,7 @@ func (l *Logger) commonFields(r *http.Request, port string) map[string]any {
 		"tags":       tags,
 		"sensorName": sensorName,
 		"port":       port,
+		"honeypot":   "galah", // Explicit honeypot identifier for ELK
 		"httpRequest": HTTPRequest{
 			SessionID:           sessionID,
 			Method:              r.Method,
@@ -148,6 +163,12 @@ func (l *Logger) commonFields(r *http.Request, port string) map[string]any {
 				hash := sha256.Sum256(data)
 				return hex.EncodeToString(hash[:])
 			}(bodyBytes),
+			// Enhanced fields for ELK analysis
+			Timestamp:     now.Format(time.RFC3339Nano),
+			RemoteAddr:    r.RemoteAddr,
+			RequestLength: requestSize,
+			ContentType:   contentType,
+			RequestSize:   requestSize,
 		},
 	}
 }

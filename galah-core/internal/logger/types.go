@@ -9,6 +9,13 @@ import (
 	cblog "github.com/charmbracelet/log"
 )
 
+// ELKConfig holds configuration for ELK Stack integration
+type ELKConfig struct {
+	Enabled      bool   `json:"enabled"`
+	LogstashHost string `json:"logstash_host,omitempty"`
+	LogstashPort int    `json:"logstash_port,omitempty"`
+}
+
 // Logger contains the components for logging.
 type Logger struct {
 	EnrichCache *enrich.Enricher
@@ -17,6 +24,7 @@ type Logger struct {
 	EventFile   *os.File
 	LLMConfig   llm.Config
 	Logger      *cblog.Logger
+	ELKConfig   *ELKConfig
 }
 
 // HTTPRequest contains information about the HTTP request.
@@ -37,6 +45,10 @@ type HTTPRequest struct {
 	RequestFingerprint  string            `json:"requestFingerprint"`
 	AttackVectors       []string          `json:"attackVectors,omitempty"`
 	SuspiciousPatterns  []string          `json:"suspiciousPatterns,omitempty"`
+	// ELK-optimized fields
+	Timestamp           string            `json:"@timestamp"`
+	RemoteAddr          string            `json:"remoteAddr"`
+	RequestLength       int64             `json:"requestLength"`
 }
 
 // ResponseMetadata holds metadata about the generated response
